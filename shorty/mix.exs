@@ -21,7 +21,7 @@ defmodule Shorty.MixProject do
   defp deps do
     [
       {:plug, "~> 1.5.0-rc.1"},
-      {:cowboy, "~> 1.1.2"},
+      {:cowboy, "~> 2.2.2"},
       {:ecto, "~> 2.2.8"}
     ]
   end

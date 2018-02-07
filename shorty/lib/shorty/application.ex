@@ -8,7 +8,7 @@ defmodule Shorty.Application do
 
     children = [
       Shorty.Server,
-      Plug.Adapters.Cowboy.child_spec(scheme: :http, plug: Shorty.Router, options: [port: port])
+      {Plug.Adapters.Cowboy2, scheme: :http, plug: Shorty.Router, options: [port: port]}
     ]
 
     opts = [strategy: :one_for_one, name: Shorty.Supervisor]
