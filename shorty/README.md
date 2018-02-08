@@ -1,21 +1,22 @@
 # Shorty
 
-**TODO: Add description**
+A URL shortener demo.
 
-## Installation
+## Usage
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `shorty` to your list of dependencies in `mix.exs`:
+### In Memory Registry
 
-```elixir
-def deps do
-  [
-    {:shorty, "~> 0.1.0"}
-  ]
-end
-```
+1. Modify `Shorty.Server` to use `alias Shorty.Registry.InMemory, as: Registry`
+2. Start with `PORT=8000 iex -S mix`
+3. Shorten URL with POST to `http://localhost:8000/shorten` with URL in the body. That returns a shortened URL.
+4. Expand URL with GET to returned URL.
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/shorty](https://hexdocs.pm/shorty).
+### Postgres (Ecto) Registry
 
+1. Modify `Shorty.Server` to use `alias Shorty.Registry.Ecto, as: Registry`
+2. Install Postgres (ex. [Postgres.app](http://postgresapp.com))
+3. Run `mix ecto.create`
+4. Run `mix ecto.migrate`
+5. Start with `PORT=8000 iex -S mix`
+6. Shorten URL with POST to `http://localhost:8000/shorten` with URL in the body.
+7. Expand URL with GET to returned URL.

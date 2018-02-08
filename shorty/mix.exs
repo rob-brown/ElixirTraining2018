@@ -22,7 +22,8 @@ defmodule Shorty.MixProject do
     [
       {:plug, "~> 1.5.0-rc.1"},
       {:cowboy, "~> 2.2.2"},
-      {:ecto, "~> 2.2.8"}
+      {:ecto, "~> 2.2.8"},
+      {:postgrex, "~> 0.13.0"}
     ]
   end
 end

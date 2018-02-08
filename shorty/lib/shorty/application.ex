@@ -8,6 +8,7 @@ defmodule Shorty.Application do
 
     children = [
       Shorty.Server,
+      Shorty.Repo,
       {Plug.Adapters.Cowboy2, scheme: :http, plug: Shorty.Router, options: [port: port]}
     ]
 

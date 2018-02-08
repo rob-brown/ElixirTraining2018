@@ -1,9 +1,10 @@
 defmodule Shorty.Server do
   use GenServer
-  alias Shorty.Registry
+  alias Shorty.Registry.InMemory, as: Registry
+  # alias Shorty.Registry.Ecto, as: Registry
 
   def start_link(_) do
-    GenServer.start_link(__MODULE__, Registry.new(), name: __MODULE__)
+    GenServer.start_link(__MODULE__, %Registry{}, name: __MODULE__)
   end
 
   def init(args) do
@@ -11,12 +12,12 @@ defmodule Shorty.Server do
   end
 
   def handle_call({:shorten, url}, _from, state) do
-    {new_state, response} = Registry.shorten(state, url)
+    {:ok, new_state, response} = Shorty.Registry.shorten(state, url)
     {:reply, response, new_state}
   end
 
   def handle_call({:lookup, id}, _from, state) do
-    response = Registry.lookup(state, id)
+    response = Shorty.Registry.lookup(state, id)
     {:reply, response, state}
   end
 end
