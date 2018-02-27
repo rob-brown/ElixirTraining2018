@@ -39,10 +39,15 @@ void sendLog(const char * log) {
 void handleTLV(char type, char length, char * buffer) {
   switch (type) {
     case PUSH: {
-      char * item = (char *)calloc(length + 1, sizeof(char));
-      memcpy(item, buffer, length);
-      stack[stackLength] = item;
-      stackLength++;
+      if (stackLength == MAX_STACK) {
+        sendError("Full");
+      }
+      else {
+        char * item = (char *)calloc(length + 1, sizeof(char));
+        memcpy(item, buffer, length);
+        stack[stackLength] = item;
+        stackLength++;
+      }
       break;
     }
     case POP: {
@@ -53,7 +58,7 @@ void handleTLV(char type, char length, char * buffer) {
     }
     case PEEK:
       if (stackLength == 0) {
-        sendError("Stack full");
+        sendError("Empty");
       }
       else {
         sendItem(stack[stackLength - 1]);
@@ -104,7 +109,6 @@ int main(int argc, char const * argv[]) {
     int shift = parseTLV(buffer, bufferLength, 0);
 
     if (shift > 0) {
-      sendLog("Shifting buffer");
       memmove(buffer + shift, buffer, bufferLength - shift);
       bufferLength -= shift;
     }
