@@ -51,9 +51,14 @@ void handleTLV(char type, char length, char * buffer) {
       break;
     }
     case POP: {
-      char * item = stack[stackLength - 1];
-      free(item);
-      stackLength--;
+      if (stackLength == 0) {
+        sendError("Empty");
+      }
+      else {
+        char * item = stack[stackLength - 1];
+        free(item);
+        stackLength--;
+      }
       break;
     }
     case PEEK:
