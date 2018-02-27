@@ -5,3 +5,16 @@ erl_crash.dump
 *.ez
 *.beam
 .DS_Store
+
+### Vim ###
+# swap
+.sw[a-p]
+.*.sw[a-p]
+# session
+Session.vim
+# temporary
+.netrwhist
+*~
+# auto-generated tag files
+tags
+
