@@ -4,7 +4,7 @@ defmodule Proc.TLV do
     parse(binary, [])
   end
 
-  defp parse(<<type, length, payload::size(length), rest::bits>>, result) do
+  defp parse(<<type::signed-native-size(8), length::signed-native-size(8), payload::bytes-size(length), rest::bits>>, result) do
     parse rest, [{type, payload} | result]
   end
   defp parse(rest, result) do

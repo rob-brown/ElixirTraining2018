@@ -43,8 +43,7 @@ defmodule Proc.Server do
   end
 
   def handle_info({_port, {:data, data}}, state) do
-    with _ = Logger.debug("Got data: #{inspect data}"),
-        buffer = state.buffer <> data,
+    with buffer = state.buffer <> data,
         {tlvs, new_buffer} = TLV.parse(buffer),
         new_state = %__MODULE__{state | buffer: new_buffer} |> handle_tlvs(tlvs) do
       {:noreply, new_state}
@@ -101,7 +100,7 @@ defmodule Proc.Server do
     handle_tlvs state, rest
   end
   defp handle_tlvs(state, [{Constant.log, log} | rest]) do
-    Logger.debug log
+    Logger.debug "Received log #{inspect log}"
     handle_tlvs state, rest
   end
   defp handle_tlvs(state, [tlv | rest]) do

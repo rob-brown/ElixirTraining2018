@@ -18,3 +18,4 @@ Session.vim
 # auto-generated tag files
 tags
 
+/proc/priv/stack

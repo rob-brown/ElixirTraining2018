@@ -86,7 +86,7 @@ int parseTLV(char * buffer, int bufferLength, int offset) {
     return offset;
   }
 
-  handleTLV(type, length, buffer);
+  handleTLV(type, length, buffer + offset + 2);
 
   return parseTLV(buffer, bufferLength, offset + length + 2);
 }
@@ -100,8 +100,6 @@ int main(int argc, char const * argv[]) {
 
   while(read(STDIN_FILENO, buffer + bufferLength, 1) > 0) {
     bufferLength++;
-
-    sendLog("Received byte");
 
     int shift = parseTLV(buffer, bufferLength, 0);
 
