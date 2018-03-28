@@ -1,0 +1,28 @@
+defmodule Serverless.MixProject do
+  use Mix.Project
+
+  def project do
+    [
+      app: :serverless,
+      version: "0.1.0",
+      elixir: "~> 1.6",
+      start_permanent: Mix.env() == :prod,
+      deps: deps()
+    ]
+  end
+
+  def application do
+    [
+      extra_applications: [:logger],
+      mod: {Serverless.Application, []}
+    ]
+  end
+
+  defp deps do
+    [
+      {:plug, "~> 1.5.0"},
+      {:cowboy, "~> 2.2.2"},
+      {:poison, "~> 3.1.0"}
+    ]
+  end
+end
