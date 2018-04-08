@@ -1,0 +1,14 @@
+<div class="control">
+  <div id="elm-content"></div>
+</div>
+<script src="<%= static_path(@conn, "/js/Main.js") %>"></script>
+<script type="text/javascript">
+  var div = document.getElementById('elm-content');
+  var host = "<%= @conn.host %>";
+  var port = "<%= @conn.port %>";
+  if (port != "80") {
+    host = host + ":" + port;
+  }
+  var url = "ws://" + host + "/socket/websocket";
+  var app = Elm.Main.embed(div, {url: url});
+</script>

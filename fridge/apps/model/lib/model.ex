@@ -1,0 +1,3 @@
+defmodule Model do
+
+end
