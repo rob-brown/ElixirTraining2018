@@ -15,6 +15,7 @@ import Json.Encode as Encode
 import Phoenix.Socket
 import Phoenix.Channel
 import Phoenix.Push
+import Html.Events.Extra exposing (onEnter)
 
 -- MODEL
 
@@ -151,7 +152,7 @@ view model =
   case model.status of
     NotConnected name ->
       div []
-        [ input [type_ "text", value name, autofocus True, onInput ChannelTextChanged] []
+        [ input [type_ "text", value name, autofocus True, onEnter JoinChannel, onInput ChannelTextChanged] []
         , button [onClick JoinChannel] [text "Join"]
         ]
     Connecting name ->
