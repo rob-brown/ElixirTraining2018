@@ -2,7 +2,7 @@
 
 SOURCE_DIR=elm
 SOURCES=$(SOURCE_DIR)/Main.elm
-DEPS=$(wildcard elm/src/*.elm) 
+DEPS=$(wildcard elm/src/*.elm)
 BUILD_DIR=priv/static/js
 JS=$(addprefix $(BUILD_DIR)/,$(notdir $(SOURCES:.elm=.js)))
 RM=rm -f
@@ -14,7 +14,7 @@ EM=elm-make
 
 # Top-level Targets
 
-all: build done
+all: clean build done
 
 build: $(JS)
 
@@ -38,4 +38,3 @@ done:
 # For debugging, ex. `make print-SOURCES`.
 # See http://blog.jgc.org/2015/04/the-one-line-you-should-add-to-every.html
 print-%: ; @echo $*=$($*)
-

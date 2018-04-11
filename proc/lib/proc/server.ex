@@ -19,7 +19,7 @@ defmodule Proc.Server do
   end
 
   def handle_cast({:push, value}, state) do
-    transmit state.port, [{Constant.push, value}]  
+    transmit state.port, [{Constant.push, value}]
     {:noreply, state}
   end
   def handle_cast(:pop, state) do
@@ -88,13 +88,13 @@ defmodule Proc.Server do
   defp handle_tlvs(state, []) do
     state
   end
-  defp handle_tlvs(state = %__MODULE{clients: [client | other_clients]}, [{Constant.item, value} | other_tlvs]) do
+  defp handle_tlvs(state = %__MODULE__{clients: [client | other_clients]}, [{Constant.item, value} | other_tlvs]) do
     with _ = GenServer.reply(client, {:ok, value}),
         new_state = %__MODULE__{state | clients: other_clients} do
       handle_tlvs(new_state, other_tlvs)
     end
   end
-  defp handle_tlvs(state = %__MODULE{clients: [client | other_clients]}, [{Constant.error, error} | other_tlvs]) do
+  defp handle_tlvs(state = %__MODULE__{clients: [client | other_clients]}, [{Constant.error, error} | other_tlvs]) do
     with _ = GenServer.reply(client, {:error, error}),
         new_state = %__MODULE__{state | clients: other_clients} do
       handle_tlvs(new_state, other_tlvs)

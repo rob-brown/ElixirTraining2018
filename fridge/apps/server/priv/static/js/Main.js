@@ -10681,8 +10681,8 @@ var _user$project$Grid$Grid = F3(
 	});
 
 var _user$project$View$bufferToLines = function (buffer) {
-	var maxY = A2(_elm_lang$core$Debug$log, 'Max y', buffer.maxY);
-	var maxX = A2(_elm_lang$core$Debug$log, 'Max x', buffer.maxX);
+	var maxY = buffer.maxY;
+	var maxX = buffer.maxX;
 	var lines = A2(
 		_elm_lang$core$List$intersperse,
 		A2(
@@ -10712,7 +10712,16 @@ var _user$project$View$bufferToLines = function (buffer) {
 			A2(_elm_lang$core$List$range, 0, maxY)));
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'font-family', _1: 'monospace'},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
 		lines);
 };
 var _user$project$View$addMagnets = F2(
@@ -10814,7 +10823,7 @@ var _user$project$View$addFrame = F3(
 						buf4))));
 	});
 var _user$project$View$cursorString = _elm_lang$core$String$fromChar(
-	_elm_lang$core$Char$fromCode(9610));
+	_elm_lang$core$Char$fromCode(9612));
 var _user$project$View$addCursor = F4(
 	function (_p4, visible, mode, buffer) {
 		var _p5 = _p4;
@@ -10832,7 +10841,7 @@ var _user$project$View$addCursor = F4(
 						break _v3_2;
 					}
 				} else {
-					var character = _p6._1 ? _user$project$View$cursorString : '';
+					var character = _p6._1 ? _user$project$View$cursorString : ' ';
 					var fullText = A2(_elm_lang$core$Basics_ops['++'], _p6._0._0, character);
 					return A3(
 						_elm_lang$core$List$foldl,

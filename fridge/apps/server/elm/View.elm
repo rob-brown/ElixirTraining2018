@@ -25,7 +25,7 @@ render state =
 
 cursorString : String
 cursorString =
-  9610 |> Char.fromCode |> String.fromChar
+  9612 |> Char.fromCode |> String.fromChar
 
 addFrame : Int -> Int -> FrameBuffer -> FrameBuffer
 addFrame width height buffer =
@@ -62,7 +62,7 @@ addCursor { x, y } visible mode buffer =
 
     (State.Insert text, visible) ->
       let
-        character = if visible then cursorString else ""
+        character = if visible then cursorString else " "
         fullText = text ++ character
       in
         fullText
@@ -79,8 +79,8 @@ addCursor { x, y } visible mode buffer =
 bufferToLines : FrameBuffer -> Html a
 bufferToLines buffer =
   let
-    maxX = Debug.log "Max x" buffer.maxX
-    maxY = Debug.log "Max y" buffer.maxY
+    maxX = buffer.maxX
+    maxY = buffer.maxY
     lines =
       List.range 0 maxY
       |> List.map (\y ->
@@ -90,4 +90,4 @@ bufferToLines buffer =
         |> text)
       |> List.intersperse (br [] [])
   in
-    div [] lines
+    div [style [("font-family", "monospace")]] lines
