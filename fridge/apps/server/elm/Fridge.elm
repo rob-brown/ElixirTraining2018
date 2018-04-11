@@ -39,7 +39,7 @@ init flags =
   { socket =
     Phoenix.Socket.init flags.url
     |> Phoenix.Socket.withDebug
-  , state = State.init
+  , state = State.empty
   , status = NotConnected ""
   } ! []
 
@@ -54,6 +54,7 @@ type Msg
   | ChannelJoined
   | ChannelLeft
   | ReceiveMagnet Encode.Value
+  | ReceiveState Encode.Value
   | BlinkCursor Time
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -90,7 +91,10 @@ update msg model =
         NotConnected text ->
           let
             room = "fridge:" ++ text
-            socket = model.socket |> Phoenix.Socket.on "add_word" room ReceiveMagnet
+            socket =
+              model.socket
+              |> Phoenix.Socket.on "add_word" room ReceiveMagnet
+              |> Phoenix.Socket.on "state" room ReceiveState
             channel =
               Phoenix.Channel.init room
               |> Phoenix.Channel.onJoin (always ChannelJoined)
@@ -110,9 +114,14 @@ update msg model =
         _ ->
           model ! []
     ChannelJoined ->
-      let name = channelName model.status
+      let
+        name = channelName model.status
+        room_id = "fridge:" ++ name
+        push = Phoenix.Push.init "state" room_id
+        (newSocket, cmd) = Phoenix.Socket.push push model.socket
+        newModel = { model | socket = newSocket, status = Connected name }
       in
-        { model | status = Connected name } ! []
+        newModel ! [Cmd.map PhoenixMsg cmd]
     ChannelLeft ->
       let name = channelName model.status
       in
@@ -128,6 +137,18 @@ update msg model =
             newModel ! []
         Err error ->
           Debug.log ("Error decoding magnet: " ++ (toString error))
+          model ! []
+    ReceiveState value ->
+      case Decode.decodeValue State.decode value of
+        Ok state ->
+          let
+            oldState = model.state
+            newState = { oldState | dimensions = state.dimensions, magnets = state.magnets }
+            newModel = Debug.log "Received state " { model | state = newState }
+          in
+            newModel ! []
+        Err error ->
+          Debug.log ("Error decoding state: " ++ (toString error))
           model ! []
     BlinkCursor _ ->
       let

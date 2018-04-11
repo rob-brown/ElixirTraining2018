@@ -10601,13 +10601,32 @@ var _user$project$State$handleNormalKeyPress = F2(
 		}
 	});
 var _user$project$State$Normal = {ctor: 'Normal'};
-var _user$project$State$init = {
+var _user$project$State$empty = {
 	dimensions: A2(_user$project$Size$init, 140, 30),
 	cursor: A2(_user$project$Point$init, 0, 0),
 	cursorVisible: true,
 	magnets: {ctor: '[]'},
 	mode: _user$project$State$Normal
 };
+var _user$project$State$init = F3(
+	function (x, y, m) {
+		return {
+			dimensions: A2(_user$project$Size$init, x, y),
+			cursor: A2(_user$project$Point$init, 0, 0),
+			cursorVisible: true,
+			magnets: m,
+			mode: _user$project$State$Normal
+		};
+	});
+var _user$project$State$decode = A4(
+	_elm_lang$core$Json_Decode$map3,
+	_user$project$State$init,
+	A2(_elm_lang$core$Json_Decode$field, 'x_size', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'y_size', _elm_lang$core$Json_Decode$int),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'magnets',
+		_elm_lang$core$Json_Decode$list(_user$project$Magnet$decode)));
 var _user$project$State$handleInsertKeyPress = F3(
 	function (code, text, state) {
 		var _p1 = code;
@@ -10921,13 +10940,16 @@ var _user$project$Fridge$init = function (flags) {
 		{
 			socket: _fbonetti$elm_phoenix_socket$Phoenix_Socket$withDebug(
 				_fbonetti$elm_phoenix_socket$Phoenix_Socket$init(flags.url)),
-			state: _user$project$State$init,
+			state: _user$project$State$empty,
 			status: _user$project$Fridge$NotConnected('')
 		},
 		{ctor: '[]'});
 };
 var _user$project$Fridge$BlinkCursor = function (a) {
 	return {ctor: 'BlinkCursor', _0: a};
+};
+var _user$project$Fridge$ReceiveState = function (a) {
+	return {ctor: 'ReceiveState', _0: a};
 };
 var _user$project$Fridge$ReceiveMagnet = function (a) {
 	return {ctor: 'ReceiveMagnet', _0: a};
@@ -11076,7 +11098,12 @@ var _user$project$Fridge$update = F2(
 				var _p6 = model.status;
 				if (_p6.ctor === 'NotConnected') {
 					var room = A2(_elm_lang$core$Basics_ops['++'], 'fridge:', _p6._0);
-					var socket = A4(_fbonetti$elm_phoenix_socket$Phoenix_Socket$on, 'add_word', room, _user$project$Fridge$ReceiveMagnet, model.socket);
+					var socket = A4(
+						_fbonetti$elm_phoenix_socket$Phoenix_Socket$on,
+						'state',
+						room,
+						_user$project$Fridge$ReceiveState,
+						A4(_fbonetti$elm_phoenix_socket$Phoenix_Socket$on, 'add_word', room, _user$project$Fridge$ReceiveMagnet, model.socket));
 					var channel = A2(
 						_fbonetti$elm_phoenix_socket$Phoenix_Channel$onClose,
 						_elm_lang$core$Basics$always(_user$project$Fridge$ChannelLeft),
@@ -11119,14 +11146,25 @@ var _user$project$Fridge$update = F2(
 				}
 			case 'ChannelJoined':
 				var name = _user$project$Fridge$channelName(model.status);
+				var room_id = A2(_elm_lang$core$Basics_ops['++'], 'fridge:', name);
+				var push = A2(_fbonetti$elm_phoenix_socket$Phoenix_Push$init, 'state', room_id);
+				var _p9 = A2(_fbonetti$elm_phoenix_socket$Phoenix_Socket$push, push, model.socket);
+				var newSocket = _p9._0;
+				var cmd = _p9._1;
+				var newModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{
+						socket: newSocket,
+						status: _user$project$Fridge$Connected(name)
+					});
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{
-							status: _user$project$Fridge$Connected(name)
-						}),
-					{ctor: '[]'});
+					newModel,
+					{
+						ctor: '::',
+						_0: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Fridge$PhoenixMsg, cmd),
+						_1: {ctor: '[]'}
+					});
 			case 'ChannelLeft':
 				var name = _user$project$Fridge$channelName(model.status);
 				return A2(
@@ -11138,13 +11176,13 @@ var _user$project$Fridge$update = F2(
 						}),
 					{ctor: '[]'});
 			case 'ReceiveMagnet':
-				var _p9 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Magnet$decode, _p2._0);
-				if (_p9.ctor === 'Ok') {
+				var _p10 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Magnet$decode, _p2._0);
+				if (_p10.ctor === 'Ok') {
 					var state = model.state;
 					var newState = _elm_lang$core$Native_Utils.update(
 						state,
 						{
-							magnets: {ctor: '::', _0: _p9._0, _1: state.magnets}
+							magnets: {ctor: '::', _0: _p10._0, _1: state.magnets}
 						});
 					var newModel = _elm_lang$core$Native_Utils.update(
 						model,
@@ -11161,7 +11199,37 @@ var _user$project$Fridge$update = F2(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
 								'Error decoding magnet: ',
-								_elm_lang$core$Basics$toString(_p9._0)),
+								_elm_lang$core$Basics$toString(_p10._0)),
+							model),
+						{ctor: '[]'});
+				}
+			case 'ReceiveState':
+				var _p11 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$State$decode, _p2._0);
+				if (_p11.ctor === 'Ok') {
+					var _p12 = _p11._0;
+					var oldState = model.state;
+					var newState = _elm_lang$core$Native_Utils.update(
+						oldState,
+						{dimensions: _p12.dimensions, magnets: _p12.magnets});
+					var newModel = A2(
+						_elm_lang$core$Debug$log,
+						'Received state ',
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{state: newState}));
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						newModel,
+						{ctor: '[]'});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						A2(
+							_elm_lang$core$Debug$log,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'Error decoding state: ',
+								_elm_lang$core$Basics$toString(_p11._0)),
 							model),
 						{ctor: '[]'});
 				}
@@ -11183,8 +11251,8 @@ var _user$project$Fridge$PressedKey = function (a) {
 	return {ctor: 'PressedKey', _0: a};
 };
 var _user$project$Fridge$subscriptions = function (model) {
-	var _p10 = model.status;
-	if (_p10.ctor === 'Connected') {
+	var _p13 = model.status;
+	if (_p13.ctor === 'Connected') {
 		return _elm_lang$core$Platform_Sub$batch(
 			{
 				ctor: '::',

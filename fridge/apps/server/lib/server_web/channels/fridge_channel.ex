@@ -15,8 +15,9 @@ defmodule ServerWeb.FridgeChannel do
 
   def handle_in(event = "state", _, socket) do
     with fridge = socket.assigns[:fridge_id],
-         state = Server.state(fridge) do
-      push socket, event, state
+         state = Server.state(fridge),
+         _ = push(socket, event, state) do
+      {:noreply, socket}
     end
   end
 

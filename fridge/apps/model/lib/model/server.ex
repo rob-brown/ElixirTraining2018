@@ -3,7 +3,7 @@ defmodule Model.Server do
   alias Model.{Fridge, Magnet}
 
   def start_link(name) do
-    Agent.start_link fn -> Fridge.new(500, 500) end, name: server_name(name)
+    Agent.start_link fn -> Fridge.new(140, 30) end, name: server_name(name)
   end
 
   def state(name) do

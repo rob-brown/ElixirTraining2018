@@ -6,6 +6,7 @@ import Char
 import Keyboard exposing (KeyCode)
 import Point exposing (Point)
 import Size exposing (Size)
+import Json.Decode as Json
 
 type Mode
   = Normal
@@ -19,12 +20,21 @@ type alias State =
   , mode: Mode
   }
 
-init : State
-init =
+empty : State
+empty =
   { dimensions = (Size.init 140 30)
   , cursor = (Point.init 0 0)
   , cursorVisible = True
   , magnets = []
+  , mode = Normal
+  }
+
+init : Int -> Int -> List Magnet -> State
+init x y m =
+  { dimensions = (Size.init x y)
+  , cursor = (Point.init 0 0)
+  , cursorVisible = True
+  , magnets = m
   , mode = Normal
   }
 
@@ -97,3 +107,11 @@ handleInsertKeyPress code text state =
           { state | mode = Insert <| text ++ (String.fromChar char) }
         -- else
         --   state
+
+decode : Json.Decoder State
+decode =
+  Json.map3 init
+    (Json.field "x_size" Json.int)
+    (Json.field "y_size" Json.int)
+    -- (Json.succeed [])
+    (Json.field "magnets" (Json.list Magnet.decode))
